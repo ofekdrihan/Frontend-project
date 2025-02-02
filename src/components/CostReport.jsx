@@ -31,8 +31,14 @@ const CostReport = () => {
         const month = selectedDate.getMonth() + 1; // Months are zero-based, so add 1
         // Fetch costs from the IndexedDB for the selected month
         const monthCosts = await db.getCostsByMonth(year, month);
-        // Update the costs state with the fetched data
-        setCosts(monthCosts);
+        
+        // Validate that required fields are present before setting state
+        const validatedCosts = monthCosts.filter(cost =>
+          cost.sum && cost.category && cost.description && cost.date
+        );
+
+        // Update the costs state with the validated data
+        setCosts(validatedCosts);
       } catch (error) {
         // Handle any error that occurs while fetching costs
         console.error('Error fetching costs:', error);
