@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Paper,
   Table,
@@ -19,7 +19,7 @@ const CostReport = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [costs, setCosts] = useState([]);
 
-  const fetchCosts = async () => {
+  const fetchCosts = useCallback(async () => {
     const db = new CostManagerDB();
     try {
       const year = selectedDate.getFullYear();
@@ -29,11 +29,11 @@ const CostReport = () => {
     } catch (error) {
       console.error('Error fetching costs:', error);
     }
-  };
+  },[selectedDate]);
 
   useEffect(() => {
     fetchCosts();
-  }, [selectedDate]);
+  }, [fetchCosts]);
 
   const handleDelete = async (id) => {
     const db = new CostManagerDB();
