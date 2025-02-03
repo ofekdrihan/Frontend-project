@@ -46,7 +46,7 @@ const CostForm = ({ onCostAdded }) => { // מקבל פונקציה שתעדכן 
     const db = new CostManagerDB();
     try {
       await db.addCost(formData);
-      onCostAdded();  // קריאה לפונקציה שיעדכן את ה-state ב-App
+      onCostAdded(); 
       setFormData({
         sum: '',
         category: '',

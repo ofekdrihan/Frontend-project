@@ -35,7 +35,7 @@ const CostChart = ({ costsUpdated }) => {
     };
 
     fetchChartData();
-  }, [costsUpdated, selectedDate]); // יש להפעיל מחדש גם כאשר costsUpdated משתנה
+  }, [costsUpdated, selectedDate]);
 
   return (
     <Paper sx={{ p: 3 }}>

@@ -15,7 +15,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { DatePicker } from '@mui/x-date-pickers';
 import { CostManagerDB } from '../idb';
 
-const CostReport = ({ costsUpdated }) => {
+const CostReport = ({ costsUpdated, onCostAdded }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [costs, setCosts] = useState([]);
 
@@ -40,6 +40,7 @@ const CostReport = ({ costsUpdated }) => {
     try {
       await db.deleteCost(id);
       fetchCosts();
+      onCostAdded(); // מעדכן את ה-state של costsUpdated כדי לעדכן את ה-pie chart
     } catch (error) {
       console.error('Error deleting cost:', error);
     }

@@ -20,7 +20,7 @@ function App() {
   const [costsUpdated, setCostsUpdated] = useState(false);
 
   const handleCostAdded = () => {
-    setCostsUpdated(prevState => !prevState); // שינוי ה-state כדי לעדכן את כל הרכיבים
+    setCostsUpdated(prevState => !prevState);
   };
 
   return (
