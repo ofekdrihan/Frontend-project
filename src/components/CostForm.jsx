@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Paper, TextField, Button, Select, MenuItem, FormControl, InputLabel, Box, FormHelperText } from '@mui/material';
+import { Paper, TextField, Button, Select, MenuItem, FormControl, InputLabel, FormHelperText } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { CostManagerDB } from '../idb';
 
+// Predefined expense categories
 const categories = [
   'Food',
   'Transportation',
@@ -12,7 +13,14 @@ const categories = [
   'Other',
 ];
 
-const CostForm = ({ onCostAdded }) => { // מקבל פונקציה שתעדכן את ה-state של עלויות ב-App
+/**
+ * CostForm Component
+ * A form to add a new cost entry with validation.
+ *
+ * @param {Function} onCostAdded - Callback function triggered when a new cost is added.
+ */
+const CostForm = ({ onCostAdded }) => {
+  // State to manage form inputs
   const [formData, setFormData] = useState({
     sum: '',
     category: '',
@@ -20,6 +28,7 @@ const CostForm = ({ onCostAdded }) => { // מקבל פונקציה שתעדכן 
     date: new Date(),
   });
 
+  // State to manage validation errors
   const [errors, setErrors] = useState({
     sum: false,
     category: false,
@@ -27,9 +36,15 @@ const CostForm = ({ onCostAdded }) => { // מקבל פונקציה שתעדכן 
     date: false
   });
 
+  /**
+   * Handles form submission, validates input fields, and adds the cost entry to the database.
+   *
+   * @param {Event} e - The form submit event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate inputs
     const newErrors = {
       sum: !formData.sum,
       category: !formData.category,
@@ -39,14 +54,17 @@ const CostForm = ({ onCostAdded }) => { // מקבל פונקציה שתעדכן 
 
     setErrors(newErrors);
 
+    // If any errors exist, prevent submission
     if (Object.values(newErrors).some(error => error)) {
       return;
     }
 
-    const db = new CostManagerDB();
+    const db = new CostManagerDB(); // Initialize database connection
     try {
-      await db.addCost(formData);
-      onCostAdded(); 
+      await db.addCost(formData); // Add cost entry to IndexedDB
+      onCostAdded(); // Trigger callback function
+      
+      // Reset form fields
       setFormData({
         sum: '',
         category: '',
@@ -54,13 +72,14 @@ const CostForm = ({ onCostAdded }) => { // מקבל פונקציה שתעדכן 
         date: new Date(),
       });
     } catch (error) {
-      console.error('Error adding cost:', error);
+      console.error('Error adding cost:', error); // Log errors
     }
   };
 
   return (
     <Paper sx={{ p: 3 }}>
       <form onSubmit={handleSubmit}>
+        {/* Input field for sum */}
         <TextField
           label="Sum"
           value={formData.sum}
@@ -75,6 +94,7 @@ const CostForm = ({ onCostAdded }) => { // מקבל פונקציה שתעדכן 
           sx={{ mb: 2 }}
         />
         
+        {/* Dropdown for category selection */}
         <FormControl fullWidth required error={errors.category} sx={{ mb: 2 }}>
           <InputLabel>Category</InputLabel>
           <Select
@@ -95,6 +115,7 @@ const CostForm = ({ onCostAdded }) => { // מקבל פונקציה שתעדכן 
           )}
         </FormControl>
 
+        {/* Input field for description */}
         <TextField
           label="Description"
           value={formData.description}
@@ -109,6 +130,7 @@ const CostForm = ({ onCostAdded }) => { // מקבל פונקציה שתעדכן 
           sx={{ mb: 2 }}
         />
 
+        {/* Date picker for selecting expense date */}
         <DatePicker
           label="Date"
           value={formData.date}
@@ -126,6 +148,7 @@ const CostForm = ({ onCostAdded }) => { // מקבל פונקציה שתעדכן 
           }}
         />
 
+        {/* Submit button */}
         <Button type="submit" variant="contained" color="primary">
           Add Cost
         </Button>
