@@ -15,7 +15,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { DatePicker } from '@mui/x-date-pickers';
 import { CostManagerDB } from '../idb';
 
-const CostReport = () => {
+const CostReport = ({ costsUpdated }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [costs, setCosts] = useState([]);
 
@@ -29,11 +29,11 @@ const CostReport = () => {
     } catch (error) {
       console.error('Error fetching costs:', error);
     }
-  },[selectedDate]);
+  }, [selectedDate]);
 
   useEffect(() => {
     fetchCosts();
-  }, [fetchCosts]);
+  }, [fetchCosts, costsUpdated]);
 
   const handleDelete = async (id) => {
     const db = new CostManagerDB();
@@ -46,11 +46,11 @@ const CostReport = () => {
   };
 
   return (
-    <Paper sx={{ p: 3, mb: 3 }}>
+    <Paper sx={{ p: 3 }}>
       <Typography variant="h6" gutterBottom>
         Monthly Cost Report
       </Typography>
-      
+
       <Box sx={{ mb: 3 }}>
         <DatePicker
           label="Select Month"
@@ -60,7 +60,7 @@ const CostReport = () => {
           sx={{ width: '100%' }}
         />
       </Box>
-      
+
       <TableContainer>
         <Table>
           <TableHead>
@@ -68,8 +68,8 @@ const CostReport = () => {
               <TableCell>Date</TableCell>
               <TableCell>Category</TableCell>
               <TableCell>Description</TableCell>
-              <TableCell align="right">Sum</TableCell>
-              <TableCell align="center">Actions</TableCell>
+              <TableCell>Sum</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -78,8 +78,8 @@ const CostReport = () => {
                 <TableCell>{new Date(cost.date).toLocaleDateString()}</TableCell>
                 <TableCell>{cost.category}</TableCell>
                 <TableCell>{cost.description}</TableCell>
-                <TableCell align="right">${cost.sum}</TableCell>
-                <TableCell align="center">
+                <TableCell>${cost.sum}</TableCell>
+                <TableCell>
                   <IconButton
                     onClick={() => handleDelete(cost.id)}
                     color="error"
