@@ -5,7 +5,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import { CostManagerDB } from '../idb';
 
 // Predefined colors for the pie chart segments
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+const colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 /**
  * CostChart Component
@@ -84,7 +84,7 @@ const CostChart = ({ costsUpdated }) => {
               label
             >
               {chartData.map((entry, index) => (
-                <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                <Cell key={index} fill={colors[index % colors.length]} />
               ))}
             </Pie>
             <Legend /> {/* Displays category labels */}
