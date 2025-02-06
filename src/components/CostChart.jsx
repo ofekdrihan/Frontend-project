@@ -1,99 +1,124 @@
-import React, { useState, useEffect } from 'react';
-import { Paper, Box, Typography } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { CostManagerDB } from '../idb';
+// components/CostChart.js
 
-// Predefined colors for the pie chart segments
+// Import necessary libraries and components
+import React, { useState, useEffect } from 'react';
+import { Paper, Stack, Typography, Box } from '@mui/material'; // Material UI components
+import { DatePicker } from '@mui/x-date-pickers'; // Date picker component
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'; // Recharts components for the chart
+import { CostManagerDB } from '../idb'; // Importing the IndexedDB utility for cost data
+
+// Array to define color scheme for chart segments
 const colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 /**
- * CostChart Component
- * Displays a pie chart representing monthly expenses categorized by type.
- * Users can select a month to view relevant cost data.
- *
- * @param {boolean} costsUpdated - A dependency that triggers data refresh when costs change.
+ * CostChart component displays a pie chart representing monthly costs by category.
+ * It also allows the user to select a specific month and view the distribution of costs.
+ * 
+ * @param {Object} props - The props object passed to the component.
+ * @param {boolean} props.costsUpdated - A flag indicating whether costs data has been updated.
+ * 
+ * @returns {JSX.Element} The rendered pie chart component.
  */
 const CostChart = ({ costsUpdated }) => {
-  // State to manage the selected date
+  // State to manage the selected date (month/year)
   const [selectedDate, setSelectedDate] = useState(new Date());
-  // State to hold the processed chart data
+  
+  // State to hold the processed chart data (categories and their total costs)
   const [chartData, setChartData] = useState([]);
 
   /**
-   * Fetch and process cost data from the IndexedDB database when the date or costsUpdated changes.
+   * Effect hook that runs when either the selectedDate or costsUpdated props change.
+   * It fetches the costs for the selected month and processes them to display in the chart.
    */
   useEffect(() => {
     const fetchChartData = async () => {
-      const db = new CostManagerDB(); // Initialize the IndexedDB connection
-      try {
-        const year = selectedDate.getFullYear(); // Get the selected year
-        const month = selectedDate.getMonth() + 1; // Get the selected month (months are 0-based)
-        const costs = await db.getCostsByMonth(year, month); // Retrieve costs for the selected month
+      // Initialize IndexedDB utility to retrieve cost data
+      const db = new CostManagerDB();
 
-        // Aggregate costs by category
+      try {
+        // Get the year and month from the selected date
+        const year = selectedDate.getFullYear();
+        const month = selectedDate.getMonth() + 1; // Months are zero-based in JavaScript
+
+        // Fetch the costs for the selected month from IndexedDB
+        const costs = await db.getCostsByMonth(year, month);
+
+        // Calculate the total costs per category by reducing the fetched costs array
         const categoryTotals = costs.reduce((acc, cost) => {
-          acc[cost.category] = (acc[cost.category] || 0) + Number(cost.sum);
+          acc[cost.category] = (acc[cost.category] || 0) + Number(cost.sum); // Sum the costs by category
           return acc;
         }, {});
 
-        // Transform aggregated data into recharts-compatible format
+        // Prepare data for the chart by transforming category totals into an array of objects
         const data = Object.entries(categoryTotals).map(([category, value]) => ({
           name: category,
-          value,
+          value: Number(value.toFixed(2)), // Round to two decimal places
         }));
 
-        setChartData(data); // Update state with formatted data
+        // Set the chart data to trigger a re-render
+        setChartData(data);
       } catch (error) {
-        console.error('Error fetching chart data:', error); // Log errors if fetching fails
+        // Log any errors that occur during data fetching
+        console.error('Error fetching chart data:', error);
       }
     };
 
-    fetchChartData(); // Invoke the data fetching function
-  }, [costsUpdated, selectedDate]); // Re-run when selectedDate or costsUpdated changes
+    // Call the function to fetch the chart data whenever the date or costs are updated
+    fetchChartData();
+  }, [costsUpdated, selectedDate]);
 
   return (
     <Paper sx={{ p: 3 }}>
-      {/* Header Title */}
-      <Typography variant="h6" gutterBottom>
-        Monthly Costs by Category
-      </Typography>
+      <Stack spacing={3}>
+        {/* Title of the chart */}
+        <Typography variant="h6">
+          Monthly Costs by Category
+        </Typography>
 
-      {/* Date Picker for Selecting Month */}
-      <Box sx={{ mb: 3 }}>
+        {/* DatePicker component to select the month */}
         <DatePicker
           label="Select Month"
           value={selectedDate}
-          onChange={setSelectedDate}
-          views={['year', 'month']}
-          sx={{ width: '100%' }}
+          onChange={setSelectedDate} // Update the selected date
+          views={['year', 'month']} // Allow selection of year and month
+          slotProps={{
+            textField: {
+              fullWidth: true // Make the text field full width
+            }
+          }}
         />
-      </Box>
 
-      {/* Pie Chart Display */}
-      <Box sx={{ height: 400 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={chartData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={150}
-              label
-            >
-              {chartData.map((entry, index) => (
-                <Cell key={index} fill={colors[index % colors.length]} />
-              ))}
-            </Pie>
-            <Legend /> {/* Displays category labels */}
-            <Tooltip /> {/* Shows cost details on hover */}
-          </PieChart>
-        </ResponsiveContainer>
-      </Box>
+        {/* Container for the pie chart */}
+        <Box sx={{ height: 400, width: '100%' }}>
+          <ResponsiveContainer>
+            <PieChart>
+              <Pie
+                data={chartData} // Data for the pie chart
+                dataKey="value" // The value field to determine the size of each segment
+                nameKey="name" // The name field to label each segment
+                cx="50%" // Center the chart horizontally
+                cy="50%" // Center the chart vertically
+                outerRadius={150} // Set the outer radius of the pie chart
+                label={({ name, percent }) => 
+                  `${name} ${(percent * 100).toFixed(0)}%` // Format label to show category name and percentage
+                }
+              >
+                {/* Map through chartData to render a Cell (pie slice) for each category */}
+                {chartData.map((entry, index) => (
+                  <Cell key={index} fill={colors[index % colors.length]} /> // Use colors for the segments
+                ))}
+              </Pie>
+              {/* Add legend on the right side */}
+              <Legend layout="vertical" align="right" verticalAlign="middle" />
+              {/* Tooltip to format the value displayed when hovering over segments */}
+              <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+            </PieChart>
+          </ResponsiveContainer>
+        </Box>
+      </Stack>
     </Paper>
   );
 };
 
+// Export the component for use in other parts of the app
 export default CostChart;

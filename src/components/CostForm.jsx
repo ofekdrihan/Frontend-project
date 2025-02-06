@@ -1,26 +1,25 @@
-import React, { useState } from 'react';
-import { Paper, TextField, Button, Select, MenuItem, FormControl, InputLabel, FormHelperText } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
-import { CostManagerDB } from '../idb';
+// components/CostForm.js
 
-// Predefined expense categories
-const categories = [
-  'Food',
-  'Transportation',
-  'Housing',
-  'Entertainment',
-  'Healthcare',
-  'Other',
-];
+// Import necessary libraries and components
+import React, { useState } from 'react';
+import { Paper, TextField, Button, Select, MenuItem, FormControl, InputLabel, FormHelperText, Stack, Typography } from '@mui/material'; // Material UI components for form elements
+import { DatePicker } from '@mui/x-date-pickers'; // Date picker component
+import { CostManagerDB } from '../idb'; // IndexedDB utility to manage cost data
+
+// Array of available categories for costs
+const categories = ['Food','Transportation','Housing','Entertainment','Healthcare','Other',];
 
 /**
- * CostForm Component
- * A form to add a new cost entry with validation.
- *
- * @param {Function} onCostAdded - Callback function triggered when a new cost is added.
+ * CostForm component allows users to add a new cost entry, including sum, category, description, and date.
+ * It validates the form before submission and saves the cost data to IndexedDB.
+ * 
+ * @param {Object} props - The props object passed to the component.
+ * @param {Function} props.onCostAdded - Callback function to notify when a cost is successfully added.
+ * 
+ * @returns {JSX.Element} The rendered cost form component.
  */
 const CostForm = ({ onCostAdded }) => {
-  // State to manage form inputs
+  // State to manage form data, including sum, category, description, and date
   const [formData, setFormData] = useState({
     sum: '',
     category: '',
@@ -28,7 +27,7 @@ const CostForm = ({ onCostAdded }) => {
     date: new Date(),
   });
 
-  // State to manage validation errors
+  // State to track validation errors for each form field
   const [errors, setErrors] = useState({
     sum: false,
     category: false,
@@ -37,14 +36,14 @@ const CostForm = ({ onCostAdded }) => {
   });
 
   /**
-   * Handles form submission, validates input fields, and adds the cost entry to the database.
-   *
-   * @param {Event} e - The form submit event.
+   * Handles form submission, validates the input, and saves the cost data to the database.
+   * 
+   * @param {Object} e - The form submission event.
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate inputs
+    // Validate form data and set errors if any field is empty
     const newErrors = {
       sum: !formData.sum,
       category: !formData.category,
@@ -54,17 +53,21 @@ const CostForm = ({ onCostAdded }) => {
 
     setErrors(newErrors);
 
-    // If any errors exist, prevent submission
+    // If any errors are found, prevent form submission
     if (Object.values(newErrors).some(error => error)) {
       return;
     }
 
-    const db = new CostManagerDB(); // Initialize database connection
+    // Initialize IndexedDB utility to save the new cost entry
+    const db = new CostManagerDB();
     try {
-      await db.addCost(formData); // Add cost entry to IndexedDB
-      onCostAdded(); // Trigger callback function
+      // Add the cost entry to IndexedDB
+      await db.addCost(formData);
+
+      // Notify the parent component that a new cost has been added
+      onCostAdded();
       
-      // Reset form fields
+      // Reset form fields after successful submission
       setFormData({
         sum: '',
         category: '',
@@ -72,89 +75,109 @@ const CostForm = ({ onCostAdded }) => {
         date: new Date(),
       });
     } catch (error) {
-      console.error('Error adding cost:', error); // Log errors
+      // Log any errors that occur while adding the cost
+      console.error('Error adding cost:', error);
     }
   };
 
   return (
     <Paper sx={{ p: 3 }}>
+      {/* Form title */}
+      <Typography variant="h6" gutterBottom>
+        Add New Cost
+      </Typography>
+      
+      {/* Form for adding a new cost entry */}
       <form onSubmit={handleSubmit}>
-        {/* Input field for sum */}
-        <TextField
-          label="Sum"
-          value={formData.sum}
-          onChange={(e) => {
-            setFormData({ ...formData, sum: e.target.value });
-            setErrors({ ...errors, sum: false });
-          }}
-          fullWidth
-          required
-          error={errors.sum}
-          helperText={errors.sum ? "Sum is required" : ""}
-          sx={{ mb: 2 }}
-        />
-        
-        {/* Dropdown for category selection */}
-        <FormControl fullWidth required error={errors.category} sx={{ mb: 2 }}>
-          <InputLabel>Category</InputLabel>
-          <Select
-            value={formData.category}
+        <Stack spacing={2}>
+          {/* Sum input field */}
+          <TextField
+            label="Sum"
+            value={formData.sum}
             onChange={(e) => {
-              setFormData({ ...formData, category: e.target.value });
-              setErrors({ ...errors, category: false });
+              // Update the sum value and reset error state
+              setFormData({ ...formData, sum: e.target.value });
+              setErrors({ ...errors, sum: false });
             }}
+            fullWidth
+            required
+            error={errors.sum} // Display error if sum is not provided
+            helperText={errors.sum ? "Sum is required" : ""}
+            type="number" // Input type for numeric values
+          />
+          
+          {/* Category select dropdown */}
+          <FormControl fullWidth required error={errors.category}>
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={formData.category}
+              onChange={(e) => {
+                // Update the category and reset error state
+                setFormData({ ...formData, category: e.target.value });
+                setErrors({ ...errors, category: false });
+              }}
+            >
+              {/* Generate menu items for each category */}
+              {categories.map((category) => (
+                <MenuItem key={category} value={category}>
+                  {category}
+                </MenuItem>
+              ))}
+            </Select>
+            {errors.category && (
+              <FormHelperText>Category is required</FormHelperText> // Display error if category is not selected
+            )}
+          </FormControl>
+
+          {/* Description input field */}
+          <TextField
+            label="Description"
+            value={formData.description}
+            onChange={(e) => {
+              // Update the description and reset error state
+              setFormData({ ...formData, description: e.target.value });
+              setErrors({ ...errors, description: false });
+            }}
+            fullWidth
+            required
+            error={errors.description} // Display error if description is not provided
+            helperText={errors.description ? "Description is required" : ""}
+          />
+
+          {/* Date picker for selecting the date */}
+          <DatePicker
+            label="Date"
+            value={formData.date}
+            onChange={(newDate) => {
+              // Update the date and reset error state
+              setFormData({ ...formData, date: newDate });
+              setErrors({ ...errors, date: false });
+            }}
+            slotProps={{
+              textField: {
+                required: true, // Make the date field required
+                error: errors.date, // Display error if date is not provided
+                helperText: errors.date ? "Date is required" : "",
+                fullWidth: true // Make the text field full width
+              }
+            }}
+          />
+
+          {/* Submit button */}
+          <Button 
+            type="submit" 
+            variant="contained" 
+            color="primary"
+            size="large"
+            sx={{ mt: 2 }}
           >
-            {categories.map((category) => (
-              <MenuItem key={category} value={category}>
-                {category}
-              </MenuItem>
-            ))}
-          </Select>
-          {errors.category && (
-            <FormHelperText>Category is required</FormHelperText>
-          )}
-        </FormControl>
-
-        {/* Input field for description */}
-        <TextField
-          label="Description"
-          value={formData.description}
-          onChange={(e) => {
-            setFormData({ ...formData, description: e.target.value });
-            setErrors({ ...errors, description: false });
-          }}
-          fullWidth
-          required
-          error={errors.description}
-          helperText={errors.description ? "Description is required" : ""}
-          sx={{ mb: 2 }}
-        />
-
-        {/* Date picker for selecting expense date */}
-        <DatePicker
-          label="Date"
-          value={formData.date}
-          onChange={(newDate) => {
-            setFormData({ ...formData, date: newDate });
-            setErrors({ ...errors, date: false });
-          }}
-          sx={{ mb: 2, width: '100%' }}
-          slotProps={{
-            textField: {
-              required: true,
-              error: errors.date,
-              helperText: errors.date ? "Date is required" : ""
-            }
-          }}
-        />
-
-        {/* Submit button */}
-        <Button type="submit" variant="contained" color="primary">
-          Add Cost
-        </Button>
+            Add Cost
+          </Button>
+        </Stack>
       </form>
     </Paper>
   );
 };
 
+// Export the component for use in other parts of the app
 export default CostForm;
