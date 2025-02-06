@@ -1,5 +1,3 @@
-// idb.js
-
 /** 
  * CostManagerDB class to manage operations with IndexedDB for storing and retrieving costs.
  */

@@ -1,11 +1,8 @@
-// components/CostChart.js
-
-// Import necessary libraries and components
 import React, { useState, useEffect } from 'react';
-import { Paper, Stack, Typography, Box } from '@mui/material'; // Material UI components
-import { DatePicker } from '@mui/x-date-pickers'; // Date picker component
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'; // Recharts components for the chart
-import { CostManagerDB } from '../idb'; // Importing the IndexedDB utility for cost data
+import { Paper, Stack, Typography, Box } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { CostManagerDB } from '../idb';
 
 // Array to define color scheme for chart segments
 const colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];

@@ -1,10 +1,7 @@
-// components/CostForm.js
-
-// Import necessary libraries and components
 import React, { useState } from 'react';
-import { Paper, TextField, Button, Select, MenuItem, FormControl, InputLabel, FormHelperText, Stack, Typography } from '@mui/material'; // Material UI components for form elements
-import { DatePicker } from '@mui/x-date-pickers'; // Date picker component
-import { CostManagerDB } from '../idb'; // IndexedDB utility to manage cost data
+import { Paper, TextField, Button, Select, MenuItem, FormControl, InputLabel, FormHelperText, Stack, Typography } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers';
+import { CostManagerDB } from '../idb';
 
 // Array of available categories for costs
 const categories = ['Food','Transportation','Housing','Entertainment','Healthcare','Other',];

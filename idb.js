@@ -1,5 +1,4 @@
-// idb.js - vanilla JS version for testing
-
+// idb.js for Vanilla JS
 // Creating an object `idb` to manage IndexedDB operations
 const idb = {
     // Method to open the database with a given name and version

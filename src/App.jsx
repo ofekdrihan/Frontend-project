@@ -1,14 +1,11 @@
-// App.jsx
-
-// Import necessary libraries and components
-import React, { useState } from 'react'; // React and useState for state management
-import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles'; // Material UI theme management
-import { Container, CssBaseline, Stack, GlobalStyles } from '@mui/material'; // Material UI components for layout and styling
-import { LocalizationProvider } from '@mui/x-date-pickers'; // Localization provider for date pickers
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'; // Date adapter for the date pickers
-import CostForm from './components/CostForm'; // Form for adding new costs
-import CostReport from './components/CostReport'; // Report of costs for the selected month
-import CostChart from './components/CostChart'; // Pie chart of costs by category
+import React, { useState } from 'react';
+import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
+import { Container, CssBaseline, Stack, GlobalStyles } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import CostForm from './components/CostForm';
+import CostReport from './components/CostReport';
+import CostChart from './components/CostChart';
 
 // Create a theme using Material UI's theme creation utility
 let theme = createTheme({

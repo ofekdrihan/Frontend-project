@@ -1,11 +1,8 @@
-// components/CostReport.js
-
-// Import necessary libraries and components
 import React, { useState, useEffect, useCallback } from 'react';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, IconButton, Stack } from '@mui/material'; // Material UI components for table and layout
-import DeleteIcon from '@mui/icons-material/Delete'; // Icon for delete button
-import { DatePicker } from '@mui/x-date-pickers'; // Date picker component
-import { CostManagerDB } from '../idb'; // IndexedDB utility to manage cost data
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, IconButton, Stack } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { DatePicker } from '@mui/x-date-pickers';
+import { CostManagerDB } from '../idb';
 
 /**
  * CostReport component displays a table of costs for a selected month.
